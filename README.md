@@ -1,7 +1,7 @@
 Запуск всего этого добра:
 
 ```
-pip install -r /path/to/requirements.txt
+pip install -r requirements.txt
 ```
 
 Переменная SAVE_RESULT отвечает за то, куда сохраняется сгенеренная карта
