@@ -6,13 +6,13 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QFrame, QMainWindow, QWidget, QPushButton, QMenuBar, QStatusBar,
                              QFileDialog, QLabel, QLineEdit)
 
-from generator import generate_map, open_cells
 from uifiles.UiSelectionWindow import Ui_selection_window
-
+from uifiles.Ui_generator_window import Ui_generator_window
 
 class Ui_Mapgenerator(QMainWindow):
-    def __init__(self):
+    def __init__(self, return_back):
         super(Ui_Mapgenerator, self).__init__()
+        self.return_back = return_back
         self.setObjectName("MainWindow")
         self.resize(825, 345)
         self.centralwidget = QWidget(self)
@@ -114,8 +114,7 @@ class Ui_Mapgenerator(QMainWindow):
 
     def to_main(self):
         self.close()
-        self.window_gen = Ui_MainWindow()
-        self.window_gen.show()
+        self.return_back()
 
     def to_choice(self):
         self.window_choice = Ui_selection_window()
@@ -125,14 +124,16 @@ class Ui_Mapgenerator(QMainWindow):
         n = int(self.lineEdit.text())
         m = int(self.lineEdit_2.text())
         size = int(self.lineEdit_3.text())
-        DIR = os.getenv('CELLS_URL')
-        DIR_SAVE = os.getenv('SAVE_RESULT')
-        cells = open_cells(DIR, size)
-        map = generate_map(n, m, size, cells)
-        map.save(DIR_SAVE)
-        self.image_window = Image_window()
-        self.image_window.load_image(DIR_SAVE)
-        self.image_window.show()
+        self.gennerator = Ui_generator_window(n, m, size)
+        self.gennerator.show()
+        # DIR = os.getenv('CELLS_URL')
+        # DIR_SAVE = os.getenv('SAVE_RESULT')
+        # cells = open_cells(DIR, size)
+        # map = generate_map(n, m, size, cells)
+        # map.save(DIR_SAVE)
+        # self.image_window = Image_window()
+        # self.image_window.load_image(DIR_SAVE)
+        # self.image_window.show()
 
     def openFileNameDialog(self):
         options = QFileDialog.Options()
@@ -167,18 +168,4 @@ class Ui_Mapgenerator(QMainWindow):
         self.load_cell.setText(_translate("MainWindow", "загрузить клетку (.png)"))
         self.back.setText(_translate("MainWindow", "Вернуться на главную"))
 
-class Image_window(QMainWindow):
-    def __init__(self):
-        super().__init__()
 
-        self.setWindowTitle('Тест')
-        self.setGeometry(200, 200, 300, 300)
-
-    def load_image(self, file_name):
-        pixmap = QPixmap(file_name)
-
-        self.label = QLabel(self)
-        self.label.setPixmap(pixmap)
-        self.label.resize(pixmap.width(), pixmap.height())
-
-        self.resize(pixmap.width(), pixmap.height())

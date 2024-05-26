@@ -10,7 +10,6 @@ class Ui_selection_window(QWidget):
         self.setWindowTitle("Выбор клеток")
         outerLayout = QVBoxLayout()
         topLayout = QFormLayout()
-        # self.resize(400, 300)
         label = QLabel(self)
         label.setGeometry(QtCore.QRect(150, 10, 221, 71))
         font = QtGui.QFont()
@@ -48,7 +47,6 @@ class Ui_selection_window(QWidget):
     def generate_body(self):
         DB_DIR = os.getenv('CELLS_URL')
         SAVE_CONFIG = os.getenv('SAVE_CONFIG')
-        save_values = []
         try:
             with open(SAVE_CONFIG, 'r') as file:
                 save_values = list(map(int, file.read().split()))

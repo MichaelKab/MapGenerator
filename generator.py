@@ -7,13 +7,13 @@ from PIL import ImageDraw
 
 def open_cells(CELLSDIR, size):
     vars_of_ceil = []
-    SAVE_CONFIG = os.getenv('SAVE_CONFIG')
+    # SAVE_CONFIG = os.getenv('SAVE_CONFIG')
     is_use = [True for i in range(100)]
-    with open(SAVE_CONFIG, 'r') as file:
-        is_use = list(map(int, file.read().split()))
+    # with open(SAVE_CONFIG, 'r') as file:
+    #     is_use = list(map(int, file.read().split()))
     for ind, el in enumerate(os.listdir(CELLSDIR)):
-        if not is_use[ind]:
-            continue
+        # if not is_use[ind]:
+        #     continue
         img = Image.open(f'{CELLSDIR}/{el}')
         img = img.convert("RGB")
         img = img.resize((size, size))
@@ -23,11 +23,10 @@ def open_cells(CELLSDIR, size):
     return vars_of_ceil
 
 
-def generate_map(n, m, size_ceil, vars_of_ceil):
+def generate_map(m, n, size_ceil, vars_of_ceil, chosen_var):
     # n - height
     # m - weight
-    SZLINE = 5
-    map = [[randint(0, len(vars_of_ceil) - 1) for _ in range(m)] for j in range(n)]
+    SZLINE = 4
     img = Image.new('RGB', (n * size_ceil + (n + 1) * SZLINE,
                             m * size_ceil + (m + 1) * SZLINE))  # widgth,height
     width = img.size[0]
@@ -37,7 +36,7 @@ def generate_map(n, m, size_ceil, vars_of_ceil):
     draw = ImageDraw.Draw(img)
     for i in range(n):
         for j in range(m):
-            now_ceil = map[i][j]
+            now_ceil = chosen_var[i][j]
             add_x = SZLINE * (i + 1)
             add_y = SZLINE * (j + 1)
             for x in range(size_ceil * i, size_ceil * (i + 1)):
@@ -49,7 +48,10 @@ def generate_map(n, m, size_ceil, vars_of_ceil):
 
 
 if __name__ == "__main__":
-    img = generate_map(20, 20, 200, open_cells('ceils'))
+    n = 20
+    m = 20
+    chosen_var = [[randint(0, 3) for _ in range(m)] for j in range(n)]
+    img = generate_map(n, m, 200, open_cells('ceils'), chosen_var)
     img.save('compose.png')
 
 # generate_map(5, 5, 30, [0])

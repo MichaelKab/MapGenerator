@@ -6,9 +6,8 @@ from PyQt5.QtWidgets import (QMainWindow, QWidget, QPushButton, QMenuBar, QStatu
 from dotenv import load_dotenv
 
 from uifiles.UiMapGen import Ui_Mapgenerator
-from uifiles.UIMainwindow import Ui_Main_Window
 
-"""
+
 class Ui_Main_Window(QMainWindow):
     def __init__(self):
         super(Ui_Main_Window, self).__init__()
@@ -61,10 +60,9 @@ class Ui_Main_Window(QMainWindow):
         self.to_generate.clicked.connect(self.open_generate)
 
     def open_generate(self):
-        self.close()
-        self.window_gen = Ui_Mapgenerator()
+        self.hide()
+        self.window_gen = Ui_Mapgenerator(self.show)
         self.window_gen.show()
-"""
 
 def main():
     app = QApplication(sys.argv)
