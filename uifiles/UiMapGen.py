@@ -132,14 +132,6 @@ class Ui_Mapgenerator(QMainWindow):
         size = int(self.lineEdit_3.text())
         self.gennerator = Ui_generator_window(n, m, size)
         self.gennerator.show()
-        # DIR = os.getenv('CELLS_URL')
-        # DIR_SAVE = os.getenv('SAVE_RESULT')
-        # cells = open_cells(DIR, size)
-        # map = generate_map(n, m, size, cells)
-        # map.save(DIR_SAVE)
-        # self.image_window = Image_window()
-        # self.image_window.load_image(DIR_SAVE)
-        # self.image_window.show()
 
     def openFileNameDialog(self):
         options = QFileDialog.Options()
