@@ -5,13 +5,13 @@ from PIL import Image
 from PIL import ImageDraw
 
 
-def open_cells(CELLSDIR, size):
+def open_cells(CELLSDIR, filenames, size):
     vars_of_ceil = []
     # SAVE_CONFIG = os.getenv('SAVE_CONFIG')
     is_use = [True for i in range(100)]
     # with open(SAVE_CONFIG, 'r') as file:
     #     is_use = list(map(int, file.read().split()))
-    for ind, el in enumerate(os.listdir(CELLSDIR)):
+    for ind, el in enumerate(filenames):
         # if not is_use[ind]:
         #     continue
         img = Image.open(f'{CELLSDIR}/{el}')

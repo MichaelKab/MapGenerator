@@ -2,7 +2,7 @@ import os
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QFormLayout, QPushButton, QLabel, QGridLayout, QCheckBox)
-
+from collections import defaultdict
 
 class Ui_selection_window(QWidget):
     def __init__(self):
@@ -49,7 +49,9 @@ class Ui_selection_window(QWidget):
         SAVE_CONFIG = os.getenv('SAVE_CONFIG')
         try:
             with open(SAVE_CONFIG, 'r') as file:
-                save_values = list(map(int, file.read().split()))
+                save_values = defaultdict(int)
+                for ind, el in enumerate(file.read().split()):
+                    save_values[ind] = int(el)
         except FileNotFoundError:
             save_values = [2 for i in range(100)]
         for ind, file_name in enumerate(os.listdir(DB_DIR)):

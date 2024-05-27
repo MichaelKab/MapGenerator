@@ -1,10 +1,11 @@
 import os
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QFormLayout, QPushButton, QLabel, QGridLayout, QCheckBox,
-                             QMessageBox, QButtonGroup, QMainWindow)
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QFormLayout, QPushButton, QLabel, QGridLayout,
+                             QButtonGroup, QMainWindow)
 from random import randint
 from generator import generate_map, open_cells
+from collections import defaultdict
 
 
 class Change_picture(QWidget):
@@ -109,7 +110,21 @@ class Ui_generator_window(QWidget):
         self.smap.mapped.connect(self.on_click)
 
     def integer_map(self):
-        for name in self.file_names:
+        DB_DIR = os.getenv('CELLS_URL')
+        SAVE_CONFIG = os.getenv('SAVE_CONFIG')
+        try:
+            with open(SAVE_CONFIG, 'r') as file:
+                save_values = defaultdict(int)
+                for ind, el in enumerate(file.read().split()):
+                    save_values[ind] = int(el)
+        except FileNotFoundError:
+            save_values = [2 for i in range(100)]
+        clear_file_names = []
+        for ind, name in enumerate(self.file_names):
+            if save_values[ind] == 2:
+                clear_file_names.append(name)
+        self.file_names = clear_file_names
+        for ind, name in enumerate(self.file_names):
             self.pixmaps.append(QPixmap(f"{self.DB_DIR}/{name}"))
             self.pixmaps[-1] = self.pixmaps[-1].scaled(100, 100)
 
@@ -117,7 +132,7 @@ class Ui_generator_window(QWidget):
 
     def save(self):
         DIR_SAVE = os.getenv('SAVE_RESULT')
-        cells = open_cells(self.DB_DIR, self.size)
+        cells = open_cells(self.DB_DIR, self.file_names, self.size)
         map_for_gen = [[0 for _ in range(self.n)] for i in range(self.m)]
         for i in range(self.n):
             for j in range(self.m):
@@ -127,13 +142,6 @@ class Ui_generator_window(QWidget):
         self.image_window = Image_window()
         self.image_window.load_image(DIR_SAVE)
         self.image_window.show()
-        save_data = []
-        # SAVE_CONFIG = os.getenv('SAVE_CONFIG')
-        # for i in range(self.body.rowCount()):
-        #     now = self.body.itemAtPosition(i, 0).widget()
-        #     save_data.append(str(now.checkState()))
-        # with open(SAVE_CONFIG, 'w') as file:
-        #     file.write(" ".join(save_data))
         self.close()
 
     def generate_body(self):
@@ -172,6 +180,8 @@ class Ui_generator_window(QWidget):
         # self.change_box.show()
         # print(new_label)
         return index
+
+
 class Image_window(QMainWindow):
     def __init__(self):
         super().__init__()
