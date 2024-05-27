@@ -1,8 +1,9 @@
 import os
+import datetime
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QFormLayout, QPushButton, QLabel, QGridLayout,
-                             QButtonGroup, QMainWindow)
+                             QButtonGroup, QMainWindow, QMessageBox)
 from random import randint
 from generator import generate_map, open_cells
 from collections import defaultdict
@@ -74,6 +75,7 @@ class MyLabel(QLabel):
 class Ui_generator_window(QWidget):
     def __init__(self, n, m, size):
         super().__init__()
+        self.image_window = None
         self.n = n
         self.m = m
         self.size = size
@@ -84,12 +86,8 @@ class Ui_generator_window(QWidget):
         self.file_names = os.listdir(self.DB_DIR)
         outerLayout = QVBoxLayout()
         topLayout = QFormLayout()
-        label = QLabel(self)
-        label.setGeometry(QtCore.QRect(150, 10, 221, 71))
         font = QtGui.QFont()
         font.setPointSize(15)
-        label.setFont(font)
-        label.setObjectName("label")
         pushButton = QPushButton(self)
         pushButton.setGeometry(QtCore.QRect(20, 32, 101, 31))
         font = QtGui.QFont()
@@ -97,9 +95,8 @@ class Ui_generator_window(QWidget):
         pushButton.setFont(font)
         pushButton.setObjectName("pushButton")
         pushButton.clicked.connect(self.save)
-        label.setText("Выберите клетки")
         pushButton.setText("Сохранить")
-        topLayout.addRow(label, pushButton)
+        topLayout.addRow(pushButton)
         self.body = QGridLayout()
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -110,28 +107,53 @@ class Ui_generator_window(QWidget):
         self.smap.mapped.connect(self.on_click)
 
     def integer_map(self):
-        DB_DIR = os.getenv('CELLS_URL')
         SAVE_CONFIG = os.getenv('SAVE_CONFIG')
+        SAVE_PERCENT = os.getenv('SAVE_PERCENT')
+        percents = defaultdict(int)
         try:
             with open(SAVE_CONFIG, 'r') as file:
                 save_values = defaultdict(int)
                 for ind, el in enumerate(file.read().split()):
                     save_values[ind] = int(el)
         except FileNotFoundError:
+            QMessageBox.about(self, "error", "Не выбраны клетки")
             save_values = [2 for i in range(100)]
+
+        try:
+            with open(SAVE_PERCENT, 'r') as file:
+                percents = defaultdict(int)
+                for ind, el in enumerate(file.read().split()):
+                    percents[ind] = int(el)
+        except FileNotFoundError:
+            QMessageBox.about(self, "error", "Не выбраны клетки")
         clear_file_names = []
+        self.clear_percents = []
+        summ_percents = 0
         for ind, name in enumerate(self.file_names):
             if save_values[ind] == 2:
                 clear_file_names.append(name)
+                self.clear_percents.append([percents[ind], len(clear_file_names) - 1])
+                summ_percents += percents[ind]
+        for i in range(len(self.clear_percents)):
+            self.clear_percents[i] = tuple([self.clear_percents[i][0] * 100 / summ_percents, self.clear_percents[i][1]])
+        self.clear_percents.sort()
         self.file_names = clear_file_names
         for ind, name in enumerate(self.file_names):
             self.pixmaps.append(QPixmap(f"{self.DB_DIR}/{name}"))
-            self.pixmaps[-1] = self.pixmaps[-1].scaled(100, 100)
-
-        self.choices = [[randint(0, len(self.file_names) - 1) for _ in range(self.m)] for j in range(self.n)]
+            self.pixmaps[-1] = self.pixmaps[-1].scaled(60, 60)
+        self.choices = [[0 for _ in range(self.m)] for j in range(self.n)]
+        for i in range(self.n):
+            for j in range(self.m):
+                now = randint(1, 100)
+                for el, ind in self.clear_percents:
+                    if now - el <= 0:
+                        self.choices[i][j] = ind
+                        break
 
     def save(self):
-        DIR_SAVE = os.getenv('SAVE_RESULT')
+        now = datetime.datetime.now()
+        date_time = now.strftime("%m-%d-%Y %H-%M-%S")
+        DIR_SAVE = os.getenv('SAVE_RESULT_DIR') + f"/result {date_time}.png"
         cells = open_cells(self.DB_DIR, self.file_names, self.size)
         map_for_gen = [[0 for _ in range(self.n)] for i in range(self.m)]
         for i in range(self.n):
@@ -139,7 +161,7 @@ class Ui_generator_window(QWidget):
                 map_for_gen[j][i] = self.choices[i][j]
         map = generate_map(self.n, self.m, self.size, cells, map_for_gen)
         map.save(DIR_SAVE)
-        self.image_window = Image_window()
+        self.image_window = Image_window(DIR_SAVE)
         self.image_window.load_image(DIR_SAVE)
         self.image_window.show()
         self.close()
@@ -152,7 +174,6 @@ class Ui_generator_window(QWidget):
             for j in range(self.m):
                 self.body.setRowStretch(i, 110)
                 pixmap = self.pixmaps[self.choices[i][j]]
-                pixmap = pixmap.scaled(100, 100)
                 label = MyLabel()
                 label.setPixmap(pixmap)
                 label.resize(pixmap.width(), pixmap.height())
@@ -183,10 +204,10 @@ class Ui_generator_window(QWidget):
 
 
 class Image_window(QMainWindow):
-    def __init__(self):
+    def __init__(self, dir_save):
         super().__init__()
 
-        self.setWindowTitle('Тест')
+        self.setWindowTitle(dir_save)
         self.setGeometry(200, 200, 300, 300)
 
     def load_image(self, file_name):

@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (QFrame, QMainWindow, QWidget, QPushButton, QMenuBar
 from uifiles.UiSelectionWindow import Ui_selection_window
 from uifiles.Ui_generator_window import Ui_generator_window
 
+
 class Ui_Mapgenerator(QMainWindow):
     def __init__(self, return_back):
         super(Ui_Mapgenerator, self).__init__()
@@ -81,6 +82,11 @@ class Ui_Mapgenerator(QMainWindow):
         self.lineEdit_3.setObjectName("lineEdit_3")
         self.load_cell = QPushButton(self.centralwidget)
         self.load_cell.setGeometry(QtCore.QRect(350, 90, 341, 51))
+        rx = QtCore.QRegExp("[0-9]{100}")
+        val = QtGui.QRegExpValidator(rx)
+        self.lineEdit.setValidator(val)
+        self.lineEdit_2.setValidator(val)
+        self.lineEdit_3.setValidator(val)
         font = QtGui.QFont()
         font.setFamily("Comic Sans MS")
         font.setPointSize(15)
@@ -167,5 +173,3 @@ class Ui_Mapgenerator(QMainWindow):
         self.lineEdit_3.setText(_translate("MainWindow", "100"))
         self.load_cell.setText(_translate("MainWindow", "загрузить клетку (.png)"))
         self.back.setText(_translate("MainWindow", "Вернуться на главную"))
-
-

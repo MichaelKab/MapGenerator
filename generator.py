@@ -1,4 +1,3 @@
-import os
 from random import randint
 
 from PIL import Image
@@ -7,17 +6,10 @@ from PIL import ImageDraw
 
 def open_cells(CELLSDIR, filenames, size):
     vars_of_ceil = []
-    # SAVE_CONFIG = os.getenv('SAVE_CONFIG')
-    is_use = [True for i in range(100)]
-    # with open(SAVE_CONFIG, 'r') as file:
-    #     is_use = list(map(int, file.read().split()))
     for ind, el in enumerate(filenames):
-        # if not is_use[ind]:
-        #     continue
         img = Image.open(f'{CELLSDIR}/{el}')
         img = img.convert("RGB")
         img = img.resize((size, size))
-        print(img.width, img.height)
         pix = img.load()
         vars_of_ceil.append(pix)
     return vars_of_ceil
@@ -31,8 +23,8 @@ def generate_map(m, n, size_ceil, vars_of_ceil, chosen_var):
                             m * size_ceil + (m + 1) * SZLINE))  # widgth,height
     width = img.size[0]
     height = img.size[1]
-    print(width)
-    print(height)
+    # print(width)
+    # print(height)
     draw = ImageDraw.Draw(img)
     for i in range(n):
         for j in range(m):
@@ -53,7 +45,3 @@ if __name__ == "__main__":
     chosen_var = [[randint(0, 3) for _ in range(m)] for j in range(n)]
     img = generate_map(n, m, 200, open_cells('ceils'), chosen_var)
     img.save('compose.png')
-
-# generate_map(5, 5, 30, [0])
-# img = Image.new('RGB', (100, 100), color='red')
-# img.save('ceils/ceil_2.png')
