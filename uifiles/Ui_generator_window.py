@@ -9,57 +9,6 @@ from generator import generate_map, open_cells
 from collections import defaultdict
 
 
-class Change_picture(QWidget):
-    def __init__(self, new_value):
-        super().__init__()
-        self.setWindowTitle("Изменить клетку")
-        self.new_value = new_value
-        self.group = QButtonGroup()
-        outerLayout = QVBoxLayout()
-        topLayout = QFormLayout()
-        font = QtGui.QFont()
-        font.setPointSize(15)
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        self.body = QGridLayout()
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.generate_body()
-        outerLayout.addLayout(topLayout)
-        outerLayout.addLayout(self.body)
-        self.setLayout(outerLayout)
-        self.group.idClicked.connect(self.save)
-
-    def save(self, id):
-        self.new_value = id
-        DB_DIR = os.getenv('CELLS_URL')
-        for ind, file_name in enumerate(os.listdir(DB_DIR)):
-            if (ind == id):
-                pixmap = QPixmap(f"{DB_DIR}/{file_name}")
-                pixmap = pixmap.scaled(100, 100)
-                self.new_value = pixmap
-        self.close()
-        print("!!!")
-
-    def generate_body(self):
-        DB_DIR = os.getenv('CELLS_URL')
-        for ind, file_name in enumerate(os.listdir(DB_DIR)):
-            self.body.setRowStretch(ind, 110)
-            pixmap = QPixmap(f"{DB_DIR}/{file_name}")
-            pixmap = pixmap.scaled(100, 100)
-            label = QLabel()
-            button_save = QPushButton(self)
-            label.setPixmap(pixmap)
-            label.resize(pixmap.width(), pixmap.height())
-            font = QtGui.QFont()
-            font.setPointSize(14)
-            button_save.setFont(font)
-            button_save.setText("Выбрать клетку")
-            self.group.addButton(button_save, ind)
-            self.body.addWidget(label, ind, 0)
-            self.body.addWidget(button_save, ind, 1)
-
-
 class MyLabel(QLabel):
     clicked = QtCore.pyqtSignal()  # новый сигнал под клик
 
@@ -81,24 +30,21 @@ class Ui_generator_window(QWidget):
         self.size = size
         self.pixmaps = []
         self.choices = []
-        self.setWindowTitle("Выбор клеток")
+        self.setWindowTitle("Предпросмотр")
         self.DB_DIR = os.getenv('CELLS_URL')
         self.file_names = os.listdir(self.DB_DIR)
         outerLayout = QVBoxLayout()
         topLayout = QFormLayout()
-        font = QtGui.QFont()
+        font = self.set_font_and_color()
         font.setPointSize(15)
         pushButton = QPushButton(self)
         pushButton.setGeometry(QtCore.QRect(20, 32, 101, 31))
-        font = QtGui.QFont()
-        font.setPointSize(14)
         pushButton.setFont(font)
         pushButton.setObjectName("pushButton")
         pushButton.clicked.connect(self.save)
         pushButton.setText("Сохранить")
         topLayout.addRow(pushButton)
         self.body = QGridLayout()
-        font = QtGui.QFont()
         font.setPointSize(10)
         self.generate_body()
         outerLayout.addLayout(topLayout)
@@ -197,11 +143,15 @@ class Ui_generator_window(QWidget):
         self.smap.setMapping(label, index)  # задать индекс
         dells.widget().deleteLater()
         self.body.addWidget(label, ind_x, ind_y)
-        # self.change_box = Change_picture(new_label)
-        # self.change_box.show()
-        # print(new_label)
         return index
 
+    def set_font_and_color(self):
+        COLOR = os.getenv('COLOR')
+        FONT = os.getenv('FONT')
+        self.setStyleSheet(f"color: {COLOR};")
+        font = QtGui.QFont()
+        font.setFamily(FONT)
+        return font
 
 class Image_window(QMainWindow):
     def __init__(self, dir_save):

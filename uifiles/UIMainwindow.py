@@ -1,4 +1,4 @@
-import sys
+import sys, os
 
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QPushButton, QMenuBar, QStatusBar,
@@ -17,25 +17,16 @@ class Ui_Main_Window(QMainWindow):
         self.centralwidget.setObjectName("centralwidget")
         self.to_generate = QPushButton(self.centralwidget)
         self.to_generate.setGeometry(QtCore.QRect(110, 120, 301, 81))
-        font = QtGui.QFont()
-        font.setFamily("Comic Sans MS")
+        font = self.set_font_and_color()
         font.setPointSize(20)
         self.to_generate.setFont(font)
         self.to_generate.setObjectName("pushButton")
         self.label = QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 500, 91))
-        font = QtGui.QFont()
-        font.setFamily("Comic Sans MS")
         font.setPointSize(30)
         self.label.setFont(font)
         self.label.setObjectName("label")
-        font = QtGui.QFont()
-        font.setFamily("Comic Sans MS")
         font.setPointSize(20)
-        # self.to_history = QPushButton(self.centralwidget)
-        # self.to_history.setGeometry(QtCore.QRect(110, 220, 301, 81))
-        # self.to_history.setFont(font)
-        # self.to_history.setObjectName("pushButton_2")
         self.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 501, 21))
@@ -64,6 +55,14 @@ class Ui_Main_Window(QMainWindow):
         self.hide()
         self.window_gen = Ui_Mapgenerator(self.show)
         self.window_gen.show()
+
+    def set_font_and_color(self):
+        COLOR = os.getenv('COLOR')
+        FONT = os.getenv('FONT')
+        self.setStyleSheet(f"color: {COLOR};")
+        font = QtGui.QFont()
+        font.setFamily(FONT)
+        return font
 
 
 def main():
